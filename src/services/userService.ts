@@ -27,3 +27,8 @@ export async function logInUser(email: string, password: string) {
   }
   return user;
 }
+
+export async function getUserById (id: number) {
+  const user = await userRepository.getUserById(id);
+  return user;
+};

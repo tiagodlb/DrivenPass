@@ -1,17 +1,16 @@
-import { user } from "@prisma/client";
-import Cryptr from "cryptr";
+import { User } from "@prisma/client";
 import prisma from "../config/database.js";
 
-export type createUser = Omit<user, "id" | "createdAt">;
+export type createUser = Omit<User, "id" | "createdAt">;
 
 export class userRepository {
-  static async postUser(data: createUser): Promise<user> {
+  static async postUser(data: createUser): Promise<User> {
     return await prisma.user.create({
       data: data,
     });
   }
 
-  static async findUserByEmail(email: string): Promise<user | null> {
+  static async findUserByEmail(email: string): Promise<User | null> {
     return await prisma.user.findUnique({
       where: {
         email,
@@ -19,7 +18,7 @@ export class userRepository {
     });
   }
 
-  static async getUserById(id: number) {
+  static async getUserById(id: number): Promise<User | null> {
     return await prisma.user.findUnique({
       where: {
         id,

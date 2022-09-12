@@ -6,8 +6,8 @@ import { generateToken } from "../../utils/user.js";
 export async function postUser(req: Request, res: Response) {
   try {
     const { email, password } = req.body;
-    await createUser(email, password);
-    res.sendStatus(201);
+    const user = await createUser(email, password);
+    res.send(user).status(201);
   } catch (error: { type: string; message: string } | any) {
     return handleError(error, req, res);
   }
@@ -24,7 +24,7 @@ export async function postSignIn(req: Request, res: Response) {
   }
 }
 
-export async function checkAuth(req: Request, res: Response) {
+export async function checkAuth(_req: Request, res: Response) {
   const { user } = res.locals;
   res.json({
     message: "You are authenticated",

@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,22 +7,24 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model user {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
-  password  String
-  createdAt DateTime @default(now())
+model User {
+  id          Int          @id @default(autoincrement())
+  email       String       @unique
+  password    String
+  createdAt   DateTime     @default(now()) @db.Timestamptz()
+  credentials Credential[]
+  safenotes SafeNote[]
+  cards       Card[]
+  wifis       Wifi[]
+  documents   Document[]
 
-  credentials credential[]
-  secureNotes secureNote[]
-  cards       cards[]
-  wifis       wifi[]
+  @@map("users")
 }
 
-model credential {
+model Credential {
   id        Int      @id @default(autoincrement())
-  user      user     @relation(fields: [userId], references: [id])
-  userId    Int      @map("user_id")
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int      @map("user_id") @unique
   label     String
   url       String
   username  String
@@ -33,22 +32,24 @@ model credential {
   createdAt DateTime @default(now()) @db.Timestamptz()
 
   @@unique([userId, label])
+  @@map("credentials")
 }
 
-model secureNote {
+model SafeNote {
   id        Int      @id @default(autoincrement())
-  user      user     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
   userId    Int      @map("user_id")
   label     String   @db.VarChar(50)
   content   String   @db.VarChar(1000)
   createdAt DateTime @default(now()) @db.Timestamptz()
 
   @@unique([userId, label])
+  @@map("safenotes")
 }
 
-model cards {
+model Card {
   id           Int      @id @default(autoincrement())
-  user         user     @relation(fields: [userId], references: [id])
+  user         User     @relation(fields: [userId], references: [id])
   userId       Int      @map("user_id")
   label        String
   number       String
@@ -61,16 +62,40 @@ model cards {
   createdAt    DateTime @default(now()) @db.Timestamptz()
 
   @@unique([userId, label])
+  @@map("cards")
 }
 
-model wifi {
+model Wifi {
   id        Int      @id @default(autoincrement())
-  user      user     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
   userId    Int      @map("user_id")
   label     String
   ssid      String
   password  String
   createdAt DateTime @default(now()) @db.Timestamptz()
+
+  @@map("wifis")
+}
+
+model Document {
+  id             Int          @id @default(autoincrement())
+  user           User         @relation(fields: [userId], references: [id])
+  userId         Int          @map("user_id")
+  type           DocumentType
+  number         String
+  name           String
+  issueDate      String
+  expirationDate String
+  issuer         String
+  createdAt      DateTime     @default(now()) @db.Timestamptz()
+
+  @@unique([userId, type])
+  @@map("documents")
+}
+
+enum DocumentType {
+  RG
+  CHN
 }
 
 enum CardType {
